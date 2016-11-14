@@ -58,6 +58,7 @@ class UpcomingEventsPage extends Component {
 }
 
  renderRow(events) {
+  console.log(events);
   return (
        <Button onPress={this._event1}>
        <View style={styles.cardcontainer}>
@@ -71,17 +72,17 @@ class UpcomingEventsPage extends Component {
             <View style={{flex:1 ,flexDirection:'row', marginRight:30,padding: 15}}>
             <CardContent>
               <Text style={styles.month}>
-              {events.name}
+              {events.date}
               </Text> 
               <Text style={styles.date}>
-              {events.name}
+              {events.date}
               </Text> 
             </CardContent>
             <View>
               <CardContent>
-                <Text style={styles.title}>{events.id}</Text>
-                <Text>{events.name}</Text>
-                <Text>{events.name}</Text>
+                <Text style={styles.title}>{events.name}</Text>
+                <Text>{events.where}</Text>
+                <Text>{events.time}</Text>
               </CardContent>
             </View>
             </View> 
@@ -92,15 +93,18 @@ class UpcomingEventsPage extends Component {
      
   );
 }
-  listenForEvents(eventsRef) {
-    console.log("Came 1");
+listenForEvents(eventsRef) {
+  console.log("Came 1");
   eventsRef.on('value', (dataSnapshot) => {
-     console.log("Came Here");
+    console.log("Came Here");
     var events = [];
-       console.log("Came Here");
+    console.log("Came Here");
     dataSnapshot.forEach((child) => {
       events.push({
-        title: child.val().title,
+        name: child.val().event_name,
+        date: child.val().event_date,
+        time: child.val().event_time,
+        where: child.val().event_where,
         _key: child.key
       });
     });
