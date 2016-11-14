@@ -43,20 +43,16 @@ class MyInterestsPage extends Component {
     this._createAccount = this._createAccount.bind(this);
     this._event1 = this._event1.bind(this);
     this._profilePage = this._profilePage.bind(this);
-    this.eventsRef = this.getRef().child('events');
+    this.db = this.props.firebaseApp.database();
 
   }
-  getRef() {
-      console.log("Reference "+ this.props.firebaseApp.database().ref().child('events'));
-        return this.props.firebaseApp.database().ref();
-      }
+
   componentDidMount() {
   // start listening for firebase updates
-  this.listenForEvents(this.eventsRef);
+  this.listenForEvents(this.db);
 }
 
  renderRow(events) {
-  console.log(events);
   return (
        <Button onPress={this._event1}>
        <View style={styles.cardcontainer}>
@@ -91,12 +87,9 @@ class MyInterestsPage extends Component {
      
   );
 }
-listenForEvents(eventsRef) {
-  console.log("Came 1");
-  eventsRef.on('value', (dataSnapshot) => {
-    console.log("Came Here");
+listenForEvents(db) {
+  db.on('value', (dataSnapshot) => {
     var events = [];
-    console.log("Came Here");
     dataSnapshot.forEach((child) => {
       events.push({
         name: child.val().event_name,
