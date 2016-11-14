@@ -12,11 +12,11 @@ import
   View,
   Navigator,
   StyleSheet,
-  ScrollView,
+  ListView,
   Text,
   TextInput,
   Image,
-  TouchableOpacity
+  TouchableHighlight
 } from 'react-native';
 
 import {
@@ -27,14 +27,20 @@ import {
   CardAction
 } from 'react-native-card-view';
 
+
+
 class UpcomingEventsPage extends Component {
 
   constructor(props) {
     super(props);
-
+     console.log("Reference "+ this.props.firebaseApp.database().ref().child('events'));
+    this.eventsRef = this.props.firebaseApp.database().ref();
+    const dataSource = new ListView.DataSource({
+      rowHasChanged: (row1, row2) => row1 !== row2,
+    });
     this.state={
       id:'upcomingEvents',
-   
+      dataSource: dataSource,
     }
     this._myInterests = this._myInterests.bind(this);
     this._createAccount = this._createAccount.bind(this);
@@ -42,6 +48,67 @@ class UpcomingEventsPage extends Component {
     this._profilePage = this._profilePage.bind(this);
 
   }
+  componentDidMount() {
+  // start listening for firebase updates
+  this.listenForEvents(this.eventsRef);
+}
+
+ renderRow(rowData) {
+  return (
+       <Button onPress={this._event1}>
+       <View style={styles.cardcontainer}>
+          <Card>
+           <CardImage>
+              <Image
+                style={{width: 350, height: 200, marginTop:10}}
+                source={require('./img/acnes.jpg')}
+              />
+            </CardImage>
+            <View style={{flex:1 ,flexDirection:'row', marginRight:30,padding: 15}}>
+            <CardContent>
+              <Text style={styles.month}>
+              {events}
+              </Text> 
+              <Text style={styles.date}>
+              {rowData}
+              </Text> 
+            </CardContent>
+            <View>
+              <CardContent>
+                <Text style={styles.title}>{rowData}</Text>
+                <Text>{events}</Text>
+                <Text>{events}</Text>
+              </CardContent>
+            </View>
+            </View> 
+            <Button> Interested </Button> 
+          </Card>
+          </View>
+          </Button>
+     
+  );
+}
+  listenForEvents(eventsRef) {
+    console.log("Came 1");
+  eventsRef.on('value', (dataSnapshot) => {
+     console.log("Came Here");
+    var events = [];
+    dataSnapshot.forEach((child) => {
+      events.push({
+        name: child.val().title,
+        _key: child.key
+      });
+    });
+
+    this.setState({
+      dataSource: this.state.dataSource.cloneWithRows(events)
+    });
+  });
+}
+
+
+
+
 
   _myInterests() {
     this.props.navigator.push({
@@ -94,155 +161,11 @@ _profilePage(){
           onLeftButtonPress={this._myInterests}
           onRightButtonPress={this._profilePage} />
     </View>
-    <ScrollView style={{backgroundColor: '#FFCF79'}}>
-        <View style={styles.cardcontainer}>
-          <Button onPress={this._event1}>
-          <Card>
-           <CardImage>
-              <Image
-                style={{width: 350, height: 200, marginTop:10}}
-                source={require('./img/acnes.jpg')}
-              />
-            </CardImage>
-            <View style={{flex:1 ,flexDirection:'row', marginRight:30,padding: 15}}>
-            <CardContent>
-              <Text style={styles.month}>
-              NOV
-              </Text> 
-              <Text style={styles.date}>
-              11
-              </Text> 
-            </CardContent>
-            <View>
-              <CardContent>
-                <Text style={styles.title}>ACNE ARCHIVE Sample Sale</Text>
-                <Text>11-12 November</Text>
-                <Text>Birger Jarlsgatan 36</Text>
-              </CardContent>
-            </View>
-            </View> 
-            <Button> Interested </Button> 
-          </Card>
-          </Button>
-
-          <Button onPress={this._createAccount}>
-          <Card>
-           <CardImage>
-              <Image
-                style={{width: 350, height: 200, marginTop:10}}
-                source={require('./img/3.png')}
-              />
-            </CardImage>
-            <View style={{flex:1 ,flexDirection:'row', marginRight:30,padding: 15}}>
-            <CardContent>
-              <Text style={styles.month}>
-              NOV
-              </Text> 
-              <Text style={styles.date}>
-              11
-              </Text> 
-            </CardContent>
-            <View>
-              <CardContent>
-                <Text style={styles.title}>Baron Utförsäljning</Text>
-                <Text>11-12 November</Text>
-                <Text>Birger Jarlsgatan 36</Text>
-              </CardContent>
-            </View>
-            </View>  
-          </Card>
-          </Button>
-
-
-          <Button onPress={this._createAccount}>
-          <Card>
-           <CardImage>
-              <Image
-                style={{width: 350, height: 200, marginTop:10}}
-                source={require('./img/1.png')}
-              />
-            </CardImage>
-            <View style={{flex:1 ,flexDirection:'row', marginRight:30,padding: 15}}>
-            <CardContent>
-              <Text style={styles.month}>
-              NOV
-              </Text> 
-              <Text style={styles.date}>
-              11
-              </Text> 
-            </CardContent>
-            <View>
-              <CardContent>
-                <Text style={styles.title}>Sandqvist Utförsäljning</Text>
-                <Text>11-12 November</Text>
-                <Text>Birger Jarlsgatan 36</Text>
-              </CardContent>
-            </View>
-            </View>  
-          </Card>
-          </Button>
-
-           <Button onPress={this._createAccount}>
-          <Card>
-           <CardImage>
-              <Image
-                style={{width: 350, height: 200, marginTop:10}}
-                source={require('./img/5.png')}
-              />
-            </CardImage>
-            <View style={{flex:1 ,flexDirection:'row', marginRight:30,padding: 15}}>
-            <CardContent>
-              <Text style={styles.month}>
-              NOV
-              </Text> 
-              <Text style={styles.date}>
-              11
-              </Text> 
-            </CardContent>
-            <View>
-              <CardContent>
-                <Text style={styles.title}>House of Dagmar Sample Sale</Text>
-                <Text>11-12 November </Text>
-                <Text>Birger Jarlsgatan 36</Text>
-              </CardContent>
-            </View>
-            </View>  
-          </Card>
-          </Button>
-
-           <Button onPress={this._createAccount}>
-          <Card>
-           <CardImage>
-              <Image
-                style={{width: 350, height: 200, marginTop:10}}
-                source={require('./img/4.png')}
-              />
-            </CardImage>
-            <View style={{flex:1 ,flexDirection:'row', marginRight:30,padding: 15}}>
-            <CardContent>
-              <Text style={styles.month}>
-              NOV
-              </Text> 
-              <Text style={styles.date}>
-              11
-              </Text> 
-            </CardContent>
-            <View>
-              <CardContent>
-                <Text style={styles.title}>Hunkydory Sample Sale</Text>
-                <Text>11-12 November</Text>
-                <Text>Birger Jarlsgatan 36</Text>
-              </CardContent>
-            </View>
-            </View>  
-          </Card>
-          </Button>
-
-        </View>
-      
-
-    </ScrollView>
-
+   <ListView
+          style={{backgroundColor: '#FFCF79'}}
+          dataSource={this.state.dataSource}
+          renderRow={this.renderRow.bind(this)}
+          />
 
     </View>
 
