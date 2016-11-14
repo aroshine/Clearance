@@ -33,8 +33,7 @@ class UpcomingEventsPage extends Component {
 
   constructor(props) {
     super(props);
-     console.log("Reference "+ this.props.firebaseApp.database().ref().child('events'));
-    this.eventsRef = this.props.firebaseApp.database().ref();
+    
     const dataSource = new ListView.DataSource({
       rowHasChanged: (row1, row2) => row1 !== row2,
     });
@@ -46,14 +45,19 @@ class UpcomingEventsPage extends Component {
     this._createAccount = this._createAccount.bind(this);
     this._event1 = this._event1.bind(this);
     this._profilePage = this._profilePage.bind(this);
+    this.eventsRef = this.getRef().child('events');
 
   }
+  getRef() {
+      console.log("Reference "+ this.props.firebaseApp.database().ref().child('events'));
+        return this.props.firebaseApp.database().ref();
+      }
   componentDidMount() {
   // start listening for firebase updates
   this.listenForEvents(this.eventsRef);
 }
 
- renderRow(rowData) {
+ renderRow(events) {
   return (
        <Button onPress={this._event1}>
        <View style={styles.cardcontainer}>
@@ -67,17 +71,17 @@ class UpcomingEventsPage extends Component {
             <View style={{flex:1 ,flexDirection:'row', marginRight:30,padding: 15}}>
             <CardContent>
               <Text style={styles.month}>
-              {events}
+              {events.name}
               </Text> 
               <Text style={styles.date}>
-              {rowData}
+              {events.name}
               </Text> 
             </CardContent>
             <View>
               <CardContent>
-                <Text style={styles.title}>{rowData}</Text>
-                <Text>{events}</Text>
-                <Text>{events}</Text>
+                <Text style={styles.title}>{events.id}</Text>
+                <Text>{events.name}</Text>
+                <Text>{events.name}</Text>
               </CardContent>
             </View>
             </View> 
@@ -93,9 +97,10 @@ class UpcomingEventsPage extends Component {
   eventsRef.on('value', (dataSnapshot) => {
      console.log("Came Here");
     var events = [];
+       console.log("Came Here");
     dataSnapshot.forEach((child) => {
       events.push({
-        name: child.val().title,
+        title: child.val().title,
         _key: child.key
       });
     });
@@ -165,6 +170,7 @@ _profilePage(){
           style={{backgroundColor: '#FFCF79'}}
           dataSource={this.state.dataSource}
           renderRow={this.renderRow.bind(this)}
+          enableEmptySections={true}
           />
 
     </View>
