@@ -27,7 +27,10 @@ class FirstPage extends Component {
     this._createAccount = this._createAccount.bind(this);
     this._logIn = this._logIn.bind(this);
   }
-  
+
+  saveUserId(id){
+    this.props.saveUserId(id);
+  }
 
   _createAccount() {
     this.props.navigator.push({
@@ -88,6 +91,7 @@ class FirstPage extends Component {
     this.props.firebaseApp.auth().signInWithEmailAndPassword(this.state.email, this.state.password
     ).then((userData) =>
       {
+        this.saveUserId(userData.uid);
         this.setState({
                 loading: false
               });
@@ -109,5 +113,7 @@ class FirstPage extends Component {
     });
   }
 }
+
+
 
 module.exports = FirstPage;
