@@ -46,10 +46,12 @@ class UpcomingEventsPage extends Component {
     this._event1 = this._event1.bind(this);
     this._profilePage = this._profilePage.bind(this);
     this.eventsRef = this.getRef().child('events');
+    this._savePin = this._savePin.bind(this);
+
+
 
   }
   getRef() {
-      console.log("Reference "+ this.props.firebaseApp.database().ref().child('events'));
         return this.props.firebaseApp.database().ref();
       }
   componentDidMount() {
@@ -58,7 +60,6 @@ class UpcomingEventsPage extends Component {
 }
 
  renderRow(events) {
-  console.log(events);
   return (
        <Button onPress={this._event1}>
        <View style={styles.cardcontainer}>
@@ -72,10 +73,10 @@ class UpcomingEventsPage extends Component {
             <View style={{flex:1 ,flexDirection:'row', marginRight:30,padding: 15}}>
             <CardContent>
               <Text style={styles.month}>
-              {events.date}
+              {}
               </Text> 
               <Text style={styles.date}>
-              {events.date}
+              {}
               </Text> 
             </CardContent>
             <View>
@@ -86,7 +87,7 @@ class UpcomingEventsPage extends Component {
               </CardContent>
             </View>
             </View> 
-            <Button> Interested </Button> 
+            <Button onPress={this._savePin}> Interested </Button> 
           </Card>
           </View>
           </Button>
@@ -94,11 +95,8 @@ class UpcomingEventsPage extends Component {
   );
 }
 listenForEvents(eventsRef) {
-  console.log("Came 1");
   eventsRef.on('value', (dataSnapshot) => {
-    console.log("Came Here");
     var events = [];
-    console.log("Came Here");
     dataSnapshot.forEach((child) => {
       events.push({
         name: child.val().event_name,
@@ -116,8 +114,11 @@ listenForEvents(eventsRef) {
 }
 
 
+  _savePin(){
+    console.log(this.props.getUserId());
 
-
+  }
+  
 
   _myInterests() {
     this.props.navigator.push({
