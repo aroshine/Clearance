@@ -30,8 +30,7 @@ import {
 class MyInterestsPage extends Component {
 
   constructor(props) {
-    super(props);
-    
+    super(props);    
     const dataSource = new ListView.DataSource({
       rowHasChanged: (row1, row2) => row1 !== row2,
     });
@@ -39,7 +38,7 @@ class MyInterestsPage extends Component {
       id:'upcomingEvents',
       dataSource: dataSource,
     }
-    this._myInterests = this._myInterests.bind(this);
+    this._upcomingEvents = this._upcomingEvents.bind(this);
     this._createAccount = this._createAccount.bind(this);
     this._event1 = this._event1.bind(this);
     this._profilePage = this._profilePage.bind(this);
@@ -49,7 +48,44 @@ class MyInterestsPage extends Component {
 
   componentDidMount() {
   // start listening for firebase updates
-  this.listenForEvents(this.db);
+  this.listenForEvents(this.db, "zoDh8hg9guZwID9uZ6S5rmpyJrD3");
+}
+
+
+
+displayEvents(events){
+  var eventList = [];
+  for(var key in events){
+    eventList.push({
+        name: events[key].event_name,
+        date: events[key].event_date,
+        time: events[key].event_time,
+        where: events[key].event_where,
+        _key: key
+      });
+  }
+  this.setState({
+    dataSource: this.state.dataSource.cloneWithRows(eventList)
+  });
+}
+listenForEvents(db, userId) {
+  var pinRef = db.ref("pins");
+  var events = {};
+  pinRef.orderByChild("user_id").equalTo(userId).on('value', (snapShot) =>{
+    var pins = snapShot.val();
+    var expectedCount = Object.keys(pins).length;
+    var foundCount = 0;
+    for(var key in pins){
+      var eventId = pins[key].event_id;
+      var eventRef = db.ref("events/" + eventId);
+      eventRef.once('value', (snap) =>{
+        events[snap.key] = snap.val();
+        if(++foundCount === expectedCount){
+          this.displayEvents(events);
+        }
+      });
+    } 
+  });
 }
 
  renderRow(events) {
@@ -57,13 +93,13 @@ class MyInterestsPage extends Component {
        <Button onPress={this._event1}>
        <View style={styles.cardcontainer}>
           <Card>
-           <CardImage>
+            <View style={{flex:1 ,flexDirection:'row'}}>
+              <CardImage>
               <Image
-                style={{width: 350, height: 200, marginTop:10}}
+                style={{width: 100, height: 156}}
                 source={require('./img/acnes.jpg')}
               />
             </CardImage>
-            <View style={{flex:1 ,flexDirection:'row', marginRight:30,padding: 15}}>
             <CardContent>
               <Text style={styles.month}>
               {}
@@ -87,34 +123,13 @@ class MyInterestsPage extends Component {
      
   );
 }
-listenForEvents(db) {
-  db.on('value', (dataSnapshot) => {
-    var events = [];
-    dataSnapshot.forEach((child) => {
-      events.push({
-        name: child.val().event_name,
-        date: child.val().event_date,
-        time: child.val().event_time,
-        where: child.val().event_where,
-        _key: child.key
-      });
-    });
-
-    this.setState({
-      dataSource: this.state.dataSource.cloneWithRows(events)
-    });
-  });
-}
 
 
-
-
-
-  _myInterests() {
+  _upcomingEvents() {
     this.props.navigator.push({
-      id:'myInterests',
+      id:'upcomingEvents',
       passProps: {
-        name:'interests'
+        name:'upcoming'
       }
     });
   }
@@ -144,6 +159,7 @@ _profilePage(){
       }
     });
 }
+
   
 
   render() {
@@ -158,7 +174,7 @@ _profilePage(){
           leftButtonIcon= {require('./img/calendar.png')}
           rightButtonIcon={require('./img/setting.png')}
           style= {styles.navBar}
-          onLeftButtonPress={this._myInterests}
+          onLeftButtonPress={this._upcomingEvents}
           onRightButtonPress={this._profilePage} />
     </View>
    <ListView
