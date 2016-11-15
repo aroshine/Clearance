@@ -31,6 +31,11 @@ const firebaseApp = firebase.initializeApp(firebaseConfig);
 class DARNNavigator extends React.Component{
   constructor(props) {
   super(props);
+  this._saveUserId = this._saveUserId.bind(this);
+  this._getUserId = this._getUserId.bind(this);
+
+  this.userId = -1;
+
   }
 
   render() {
@@ -39,22 +44,32 @@ class DARNNavigator extends React.Component{
       <Navigator
         style={{flex:1}}
         initialRoute={{id: initialRouteID}}
-        renderScene={this.navigatorRenderScene}/>
+        renderScene={this.navigatorRenderScene.bind(this)}/>
+
     );
   }
+
+  _saveUserId(id){
+    this.userId = id;
+
+  }
+  _getUserId(){
+    return this.userId;
+  }
+
 
   navigatorRenderScene(route, navigator) {
     switch (route.id) {
       case 'first':
-        return (<FirstPage navigator={navigator} route={route} firebaseApp={firebaseApp} title="first"/>);
+        return (<FirstPage navigator={navigator} route={route} firebaseApp={firebaseApp} saveUserId={this._saveUserId} title="first"/>);
       case 'second':
         return (<SecondPage navigator={navigator} route={route} firebaseApp={firebaseApp} title="second"/>);
       case 'upcomingEvents':
-        return (<UpcomingEventsPage navigator={navigator} route={route} firebaseApp={firebaseApp} title="upcomingEvents"/>);
+        return (<UpcomingEventsPage navigator={navigator} route={route} firebaseApp={firebaseApp} getUserId={this._getUserId} title="upcomingEvents"/>);
       case 'profile':
         return (<ProfilePage navigator={navigator} route={route} firebaseApp={firebaseApp} title="profile"/>);
       case 'myInterests':
-        return (<MyInterestsPage navigator={navigator} route={route} firebaseApp={firebaseApp} title="MyInterests"/>);
+        return (<MyInterestsPage navigator={navigator} route={route} firebaseApp={firebaseApp}  title="MyInterests"/>);
       case 'eventsPage':
         return (<EventsPage navigator={navigator} route={route} firebaseApp={firebaseApp} title="EventsPage"/>);
 
